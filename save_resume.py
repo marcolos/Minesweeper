@@ -3,14 +3,14 @@ import csv
 # Chiamo la save quando esco
 class Save:
     def __init__(self,controller=None):
-        status = controller._model.status
-        counter = controller._model.counter
-        n_caselline_open = controller._model.n_caselline_open
-        size = controller._model.b_size
-        n_mines = controller._model.n_mines
-        n_caselline_flagged = controller._model.n_caselline_flagged
+        status = controller.model.status
+        counter = controller.model.counter
+        n_caselline_open = controller.model.n_caselline_open
+        size = controller.model.b_size
+        n_mines = controller.model.n_mines
+        n_caselline_flagged = controller.model.n_caselline_flagged
 
-        caselline = controller._model.getCaselline()
+        caselline = controller.model.getCaselline()
         tmp=[]
         matrice=[]
         for x in range(0, size):

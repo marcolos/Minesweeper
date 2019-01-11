@@ -57,7 +57,21 @@ class MinesweeperModel(QObject):
                 self.oldWin = True
             else:
                 self.oldWin = False
-            self.caselline = M
+
+            self.caselline = []
+            tmp = []
+            for x in range(0, self.b_size):
+                for y in range(0, self.b_size):
+                    is_mine, adjacent_n, is_revealed, is_flagged = M[x][y].split()
+                    is_mine = eval(is_mine)
+                    adjacent_n = int(adjacent_n)
+                    is_revealed = eval(is_revealed)
+                    is_flagged = eval(is_flagged)
+                    casellina = Casellina(x, y, is_mine=is_mine, adjacent_n=adjacent_n, is_revealed=is_revealed, is_flagged=is_flagged)
+                    tmp.append(casellina)
+                self.caselline.append(tmp)
+                tmp = []
+
 
 
     def getCaselline(self):
@@ -103,17 +117,19 @@ class MinesweeperModel(QObject):
 
         return positions
 
-    #Quando pigio il bottone del layout orizzontale
-    # def button_pressed(self):
-    #     self.n_caselline_open = 0
-    #     if self.status == MinesweeperModel.STATUS_PLAYING:
-    #         self.update_status(MinesweeperModel.STATUS_FAILED)
-    #         self.reveal_map()  #scopre le caselline
-    #
-    #     elif self.status == MinesweeperModel.STATUS_FAILED or MinesweeperModel.STATUS_SUCCESS :
-    #         self.update_status(MinesweeperModel.STATUS_READY)
-    #         self.reset_map()  #resetta la mappa
-    #         self.winOld = False
+    # Quando pigio il bottone del layout orizzontale
+    def button_pressed(self):
+        self.n_caselline_open = 0
+        self.n_caselline_flagged = 0
+        self.isFlagged(0)
+        if self.status == MinesweeperModel.STATUS_PLAYING:
+            self.update_status(MinesweeperModel.STATUS_FAILED)
+            self.reveal_map()  #scopre le caselline
+
+        elif self.status == MinesweeperModel.STATUS_FAILED or MinesweeperModel.STATUS_SUCCESS :
+            self.update_status(MinesweeperModel.STATUS_READY)
+            self.reset_map()  #resetta la mappa
+            self.oldWin = False
 
     #Scopre tutte le caselline, rivelando dove erano situate bombe e numeri
     def reveal_map(self):
@@ -158,6 +174,8 @@ class MinesweeperModel(QObject):
     def update_status(self, status):
         self.status = status
         self.statusUpdate.emit(self.status)
+
+
 
 
 # Classe per creare le caselline nelle quali possono esserci numeri o bombe

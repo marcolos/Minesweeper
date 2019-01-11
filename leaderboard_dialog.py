@@ -24,7 +24,7 @@ class LeaderboardDialog:
         self.grid.addItem(hspacer2, 0, 5)
 
 
-        B , I , E = controller._leaderboardModel.getFile()
+        B , I , E = controller.leaderboardModel.getFile()
 
         lenB = B.__len__()
         lenI = I.__len__()
@@ -63,10 +63,10 @@ class InsertWinnerDialog:
         self.grid = QGridLayout()
         l = QLabel(text="Insert Name")
         self.grid.addWidget(l,1,0)
-        self._textinputs = QLineEdit()
-        self.grid.addWidget(self._textinputs, 1, 1)
-        self._configbutton = QPushButton(text="Insert")
-        self.grid.addWidget(self._configbutton, 2, 1, 2, 1)
+        self.textinputs = QLineEdit()
+        self.grid.addWidget(self.textinputs, 1, 1)
+        self.configbutton = QPushButton(text="Insert")
+        self.grid.addWidget(self.configbutton, 2, 1, 2, 1)
 
         self.w.setLayout(self.grid)
         self.dialog.resize(self.w.sizeHint())

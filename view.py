@@ -32,8 +32,8 @@ class MinesweeperView(object):
         self._timer = QTimer()
 
         # Imposto il testo del n° di mine e del timer, rispettivamente a n_mines e a 000
-        self.mines.setText("%03d" % controller._model.n_mines)
-        self.clock.setText("%03d" % controller._model.counter)
+        self.mines.setText("%03d" % controller.model.n_mines)
+        self.clock.setText("%03d" % controller.model.counter)
 
         # Creo il bottone (all'inizio sarà una croce verde) e lo setto in dimensione ed icona
         self.button = QPushButton()
@@ -71,9 +71,9 @@ class MinesweeperView(object):
         self.grid = QGridLayout()
         self.grid.setSpacing(5)  # Imposto lo spazio tra le griglie
 
-        caselline=controller._model.getCaselline()  # Matrice contente tutte le caselline
-        for x in range(0, controller._model.b_size):  # Scorriamo la matrice
-            for y in range(0, controller._model.b_size):
+        caselline=controller.model.getCaselline()  # Matrice contente tutte le caselline
+        for x in range(0, controller.model.b_size):  # Scorriamo la matrice
+            for y in range(0, controller.model.b_size):
                 self.grid.addWidget(caselline[x][y], x, y) # Aggiungiamo la caselline alla grid  ## FORSE INVERTIRE X-Y
                 # Nell addWidget bisogna mettere prima y e poi x perchè questa funzione prende (QWidjet,row, column)
                 # Facciamo quindi un inserimento per colonna (riempiamo prima tutta la 1° colonna e via di seguito)
