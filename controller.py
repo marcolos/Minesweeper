@@ -21,7 +21,7 @@ LEVELS = (
 #     [22, 3],
 #     [23,4]
 # )
-
+pppp
 # CONTROLLER
 class Minesweeper(QMainWindow):
     def __init__(self):
