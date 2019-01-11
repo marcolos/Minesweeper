@@ -9,17 +9,18 @@ from save_resume import Save,Resume
 from leaderboard_dialog import LeaderboardDialog,InsertWinnerDialog
 from leaderboard_model import LeaderboardModel
 
-# LEVELS = (
-#     [9,10],
-#     [16,40],
-#     [25,99]
-# )
-
 LEVELS = (
-    [21, 2],
-    [22, 3],
-    [23,4]
+    [9,10],
+    [16,40],
+    [25,99]
 )
+
+# PER TESTING
+# LEVELS = (
+#     [21, 2],
+#     [22, 3],
+#     [23,4]
+# )
 
 # CONTROLLER
 class Minesweeper(QMainWindow):
@@ -35,7 +36,7 @@ class Minesweeper(QMainWindow):
 
         # Riesumo la vecchia partita
         else:
-            status,counter,n_caselline_open,size,n_mines = self.r.getValue()
+            status,counter,n_caselline_open,size,n_mines,n_caselline_flagged = self.r.getValue()
             M = self.r.getMatrix()
 
             caselline = []
@@ -53,7 +54,8 @@ class Minesweeper(QMainWindow):
                 tmp = []
 
             # Instantiate a model.
-            self._model = MinesweeperModel(M = caselline, STATUS = status,counter = counter,n_caselline_open = n_caselline_open,LEVEL=[size,n_mines])
+            self._model = MinesweeperModel(M = caselline, STATUS = status,counter = counter,n_caselline_open = n_caselline_open,LEVEL=[size,n_mines], n_caselline_flagged = n_caselline_flagged)
+
 
         # Instantiate a view.
         self._view = MinesweeperView(self)
@@ -68,11 +70,12 @@ class Minesweeper(QMainWindow):
         # Instanzio la view, della Vittoria.
         self._insertWinner = InsertWinnerDialog()
 
-        # Connetto tutti i segnali della partita normale più uno
+        # Connetto tutti i segnali della partita normale
         self.connectSignal()
 
         # Chiamo questa funzione per emettere il primo segnale
         self._model.update_status(self._model.status)
+        self._model.isFlagged(0)
 
 
     def connectSignal(self):
@@ -84,7 +87,9 @@ class Minesweeper(QMainWindow):
                 c[x][y].expandable.connect(self._model.expand_reveal)
                 c[x][y].finished.connect(self._model.game_over)
                 c[x][y].controlWin.connect(self._model.isWin)
+                c[x][y].controlFlag.connect(self._model.isFlagged)
 
+        self._model.notifyFlagged.connect(self.updateViewFlag)
 
         # Connetto il bottone della view (quello con l'emoticon) alla funzione button_pressed
         self._view.button.pressed.connect(self.button_pressed)
@@ -94,7 +99,6 @@ class Minesweeper(QMainWindow):
 
         # La uso per notificare l'aggiornamento dello status del model. Quando lo status del model cambia viene lanciato il segnale statusUpdate, il quale chiama la statusUpdateView(slot)
         self._model.statusUpdate.connect(self.statusUpdateView)
-
 
         # Connetto le action del Menu bar
         self._view.action_Beginner.triggered.connect(self.on_configureBeginner)
@@ -114,8 +118,8 @@ class Minesweeper(QMainWindow):
     def statusUpdateView(self,status):
         self._view.button.setIcon(QIcon(self._model.STATUS_ICONS[status]))
         if status == 0: # STATUS_READY
-            self._model._counter = 0
-            self._view.clock.setText("%03d" % self._model._counter)
+            self._model.counter = 0
+            self._view.clock.setText("%03d" % self._model.counter)
         if status == 1: # STATUS_PLAYING
             self._view._timer.start(1000)
         if status == 2: #STATUS_FAILED
@@ -128,12 +132,14 @@ class Minesweeper(QMainWindow):
 
     # Incrementa il timer
     def everysecond(self):
-        self._model._counter = self._model._counter+1
-        self._view.clock.setText("%03d" % self._model._counter)
+        self._model.counter = self._model.counter+1
+        self._view.clock.setText("%03d" % self._model.counter)
 
     # Quando pigio il bottone del layout orizzontale
     def button_pressed(self):
-        self._model._n_caselline_open = 0
+        self._model.n_caselline_open = 0
+        self._model.n_caselline_flagged = 0
+        self._model.isFlagged(0)
         if self._model.status == MinesweeperModel.STATUS_PLAYING:
             self._model.update_status(MinesweeperModel.STATUS_FAILED)
             self._model.reveal_map()  # scopre le caselline
@@ -142,6 +148,9 @@ class Minesweeper(QMainWindow):
             self._model.update_status(MinesweeperModel.STATUS_READY)
             self._model.reset_map()  # resetta la mappa
             self._model.oldWin = False
+
+    def updateViewFlag(self):
+        self._view.mines.setText("%03d" % (self._model.n_mines - self._model.n_caselline_flagged))
 
     # Configurazione Custom
     def on_configure(self):
@@ -213,7 +222,7 @@ class Minesweeper(QMainWindow):
     def insertWinner(self):
         B,I,E = self._leaderboardModel.getFile()
         name = self._insertWinner._textinputs.text()
-        time = str(self._model._counter)
+        time = str(self._model.counter)
         tmp = []
         tmp.append(name)
         tmp.append(time)

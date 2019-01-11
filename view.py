@@ -33,7 +33,7 @@ class MinesweeperView(object):
 
         # Imposto il testo del n° di mine e del timer, rispettivamente a n_mines e a 000
         self.mines.setText("%03d" % controller._model.n_mines)
-        self.clock.setText("%03d" % controller._model._counter)
+        self.clock.setText("%03d" % controller._model.counter)
 
         # Creo il bottone (all'inizio sarà una croce verde) e lo setto in dimensione ed icona
         self.button = QPushButton()

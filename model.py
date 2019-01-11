@@ -23,14 +23,16 @@ class MinesweeperModel(QObject):
 
     statusUpdate = pyqtSignal(int)
     notifyWin = pyqtSignal(int,int)
+    notifyFlagged = pyqtSignal()
 
-    def __init__(self, M = None ,STATUS = None, counter = None, n_caselline_open = None, LEVEL=[16,40]):
+    def __init__(self, M = None ,STATUS = None, counter = None, n_caselline_open = None, n_caselline_flagged = None, LEVEL=[16,40]):
         super().__init__(parent=None)
 
         if M is None:
             self.b_size , self.n_mines =LEVEL  # Inizializzo n° caselle e n° bombe
-            self._counter=0  # Per il timer
-            self._n_caselline_open = 0
+            self.counter=0  # Per il timer
+            self.n_caselline_open = 0
+            self.n_caselline_flagged = 0
             self.oldWin = False
             self.status = MinesweeperModel.STATUS_READY
             self.caselline = []
@@ -47,8 +49,9 @@ class MinesweeperModel(QObject):
         else:
 
             self.b_size, self.n_mines = LEVEL
-            self._counter = counter
-            self._n_caselline_open = n_caselline_open
+            self.counter = counter
+            self.n_caselline_open = n_caselline_open
+            self.n_caselline_flagged = n_caselline_flagged
             self.status = STATUS
             if self.status== MinesweeperModel.STATUS_SUCCESS:
                 self.oldWin = True
@@ -102,7 +105,7 @@ class MinesweeperModel(QObject):
 
     #Quando pigio il bottone del layout orizzontale
     # def button_pressed(self):
-    #     self._n_caselline_open = 0
+    #     self.n_caselline_open = 0
     #     if self.status == MinesweeperModel.STATUS_PLAYING:
     #         self.update_status(MinesweeperModel.STATUS_FAILED)
     #         self.reveal_map()  #scopre le caselline
@@ -139,11 +142,16 @@ class MinesweeperModel(QObject):
         self.update_status(MinesweeperModel.STATUS_FAILED)
 
     def isWin(self):
-        self._n_caselline_open = self._n_caselline_open + 1
+        self.n_caselline_open = self.n_caselline_open + 1
         win = (self.b_size * self.b_size) - self.n_mines
-        if self._n_caselline_open == win:
+        if self.n_caselline_open == win:
             #Ho vinto
             self.update_status(MinesweeperModel.STATUS_SUCCESS)
+
+    def isFlagged(self,num):
+        self.n_caselline_flagged = self.n_caselline_flagged + num
+        self.notifyFlagged.emit()
+
 
     # Quando lo stato si aggiorna viene emesso il segnale statusUpdate, il quale è collagato alla statusUpdateView nel controllor
     # Serve per notificare al controllor che lo stato è cambiato, in modo che il controllor possa far partire il timer alla view e cambiare icona a seconda dello stato
@@ -163,7 +171,9 @@ class Casellina(QWidget):
     expandable = pyqtSignal(int,int)
     started = pyqtSignal()
     finished = pyqtSignal()
-    controlWin = pyqtSignal()
+    controlWin = pyqtSignal()  # Aggiorna n_caselline_open nel MinesweeperModel
+    controlFlag = pyqtSignal(int)  # Aggiorna n_caselline_flagged nel MinesweeperModel
+
 
     NUM_COLORS = {
         1: QColor('#f44336'),
@@ -178,6 +188,8 @@ class Casellina(QWidget):
 
     IMG_BOMB = QImage("./images/bomb.png")
     IMG_FLAG = QImage("./images/flag.png")
+
+
 
     def __init__(self, x, y, is_mine = False, adjacent_n = 0, is_revealed = False, is_flagged = False, *args, **kwargs):
         super(Casellina,self).__init__(*args, **kwargs)
@@ -236,10 +248,12 @@ class Casellina(QWidget):
     def flag(self):
         if self.is_flagged == False:
             self.is_flagged = True
+            self.controlFlag.emit(1)
             self.update()
 
         elif self.is_flagged == True:
             self.is_flagged = False
+            self.controlFlag.emit(-1)
             self.update()
 
 
@@ -249,10 +263,13 @@ class Casellina(QWidget):
 
     # Viene chiamata appena premo su una casellina con il sinistro (Vedere la mouseReleaseEvent)
     def click(self):
-        if not self.is_revealed:
+        if (not self.is_revealed) and (not self.is_flagged):
             self.reveal()
             if self.is_mine is False:
                 self.controlWin.emit()
+            else:
+                self.finished.emit()  # esegue la game_over
+
             if self.adjacent_n == 0:
                 self.expandable.emit(self.x, self.y)  # Quando la casellina è vuota la espando(scopro anche quelle accanto finche non trovo numeri o bombe)
 
@@ -267,7 +284,7 @@ class Casellina(QWidget):
         elif (e.button() == Qt.LeftButton):
             self.click()  # Chiamo la click() quando prmo con il sinistro
 
-            if self.is_mine:  # Se nella casellina c'è la mina emetto il segnale di fine
-                Casellina._n_caselline_open = 0
-                self.finished.emit()  # esegue la game_over
+            # if self.is_mine:  # Se nella casellina c'è la mina emetto il segnale di fine
+            #     Casellina.n_caselline_open = 0
+            #     self.finished.emit()  # esegue la game_over
 
