@@ -8,7 +8,7 @@ IMG_START = QImage("./images/rocket.png")
 IMG_CLOCK = QImage("./images/timer.png")
 
 
-class View(object):
+class MinesweeperView(object):
     def __init__(self,controller):
         w = QWidget()  # Definisco lo widget per inserirci dentro il layout
         hb = QHBoxLayout()  # Definisco un layout orizzontale
@@ -33,7 +33,7 @@ class View(object):
 
         # Imposto il testo del n° di mine e del timer, rispettivamente a n_mines e a 000
         self.mines.setText("%03d" % controller._model.n_mines)
-        self.clock.setText("000")
+        self.clock.setText("%03d" % controller._model._counter)
 
         # Creo il bottone (all'inizio sarà una croce verde) e lo setto in dimensione ed icona
         self.button = QPushButton()
@@ -88,4 +88,51 @@ class View(object):
         # |                                               |       -> vb
         # |                   GRID                        |
         # |_______________________________________________|
+
+        # E' LA STATUS BAR (quella infondo alla pagina)
+        # self.statusbar = QStatusBar(controller)
+        # controller.setStatusBar(self.statusbar)
+
+        # MENUBAR (è la barra)
+        self.menuBar = QMenuBar(controller)
+        self.menuBar.setGeometry(QRect(0, 0, 643, 22))
+        self.menuBar.setDefaultUp(False)
+        self.menuBar.setNativeMenuBar(False)
+
+        # MENU GAME
+        self.menu_Game = QMenu(self.menuBar)
+        self.action_Beginner = QAction(controller)
+        self.action_Intermediate = QAction(controller)
+        self.action_Expert = QAction(controller)
+        self.action_Custom = QAction(controller)
+        self.menu_Game.addAction(self.action_Beginner)
+        self.menu_Game.addAction(self.action_Intermediate)
+        self.menu_Game.addAction(self.action_Expert)
+        self.menu_Game.addAction(self.action_Custom)
+        self.menu_Game.setTitle("&Game")
+        self.action_Beginner.setText("&Beginner")
+        self.action_Intermediate.setText("&Intermediate")
+        self.action_Expert.setText("&Expert")
+        self.action_Custom.setText("&Custom")
+        self.menuBar.addAction(self.menu_Game.menuAction())
+
+        # LEADERBOARD
+        self.action_Leaderboard = QAction(controller)
+        self.action_Leaderboard.setText("&Leaderboard")
+        self.menuBar.addAction(self.action_Leaderboard)
+
+        # MENU HELP
+        self.menu_Help = QMenu(self.menuBar)
+        self.action_About = QAction(controller)
+        self.menu_Help.addAction(self.action_About)
+        self.menu_Help.setTitle("&Help")
+        self.action_About.setText("&About")
+        self.menuBar.addAction(self.menu_Help.menuAction())
+
+
+        controller.setMenuBar(self.menuBar)
+
+
+
+
 
