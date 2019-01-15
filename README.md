@@ -14,3 +14,48 @@ The of Minesweeper are fairly simple:
 - To mark a square you think is a bomb, point and right-click.
 - If you mark a bomb incorrectly, you will have to correct the mistake before you can win. Incorrect bomb marking doesn’t kill you, but it can lead to mistakes which do.
 - You don’t have to mark all the bombs to win; you just need to open all non-bomb squares.
+
+## Implementation
+The game was implemented using Python. The GUI was implemented using PyQt5 framework .
+The app was developed using the MVC(Model-View-Control) pattern
+
+### The Model
+The main model has been implemented in the `MinesweeperModel` Class.
+
+This class contains the game state and the rules of the game.
+
+It provides methods to get, set, modify and evolve the state following the rules.
+
+Attributes:
+- size = Minesweeper size (square form)
+- counter = is the timer counter
+- n_mines = number of mine in the map
+- n_caselline_open = number of square opened
+- n_caselline_flagged = number of square flagged
+- oldWin = is a boolean value. It's used to handler the save and resume features. It's true if when the game is closed, your state was SUCCESS. It's has been used to no re-open the insertWinner dialog.
+- status = is the game status. It can be Ready,Playing,Failed or Success
+- caselline = is a matrix of casellina(square)
+
+For the leaderboard has been implemented another Model Class named `LeaderboardModel`.
+
+### The View
+There are a main view, a leaderboard view, custom view and insert winner view.
+They are implemented in the `MinesweeperView`, `LeaderboardDialog` `CustomDialog` and `InsertWinnerDialog` classes.
+There are a main view, a leaderboard view, and a custom view.
+The main view shows all the Minesweeper game.
+The leaderboard view shows the leaderboards. There are 3 leaderboards, one for each level (Beginner, Intermediate, Expert)
+The custom view allows you to set the mine numbers, and size.
+The insert winner dialog allows you to insert your name when you are playing at Beginner, Intermediate or Expert level and you win.
+
+## Functionalities
+The game can be launched from the `main.py` script:
+```
+$ python3 main.py
+```
+or if you have installed anaconda you can do:
+```
+$ ipython
+$ run main.py
+```
+The Main window presents itself like this:
+![gui.png](./images/gui.png)
