@@ -29,7 +29,7 @@ class MinesweeperModel(QObject):
         super().__init__(parent=None)
 
         if M is None:
-            self.b_size , self.n_mines =LEVEL  # Inizializzo n° caselle e n° bombe
+            self.size , self.n_mines =LEVEL  # Inizializzo n° caselle e n° bombe
             self.counter=0  # Per il timer
             self.n_caselline_open = 0
             self.n_caselline_flagged = 0
@@ -37,8 +37,8 @@ class MinesweeperModel(QObject):
             self.status = MinesweeperModel.STATUS_READY
             self.caselline = []
             tmp =[]
-            for x in range(0, self.b_size):
-                for y in range(0, self.b_size):
+            for x in range(0, self.size):
+                for y in range(0, self.size):
                     casellina = Casellina(x,y)
                     tmp.append(casellina)
                 self.caselline.append(tmp)  # caselline sarà  caselline[x][y]
@@ -48,7 +48,7 @@ class MinesweeperModel(QObject):
 
         else:
 
-            self.b_size, self.n_mines = LEVEL
+            self.size, self.n_mines = LEVEL
             self.counter = counter
             self.n_caselline_open = n_caselline_open
             self.n_caselline_flagged = n_caselline_flagged
@@ -60,8 +60,8 @@ class MinesweeperModel(QObject):
 
             self.caselline = []
             tmp = []
-            for x in range(0, self.b_size):
-                for y in range(0, self.b_size):
+            for x in range(0, self.size):
+                for y in range(0, self.size):
                     is_mine, adjacent_n, is_revealed, is_flagged = M[x][y].split()
                     is_mine = eval(is_mine)
                     adjacent_n = int(adjacent_n)
@@ -72,22 +72,47 @@ class MinesweeperModel(QObject):
                 self.caselline.append(tmp)
                 tmp = []
 
-
-
     def getCaselline(self):
         return self.caselline
 
+    def resetCounter(self):
+        self.counter = 0
+
+    def addCounter(self):
+        self.counter = self.counter + 1
+
+    def getCounter(self):
+        return self.counter
+
+    def getLevel(self):
+        return [self.size,self.n_mines]
+
+    def getSize(self):
+        return self.size
+
+    def get_n_mines(self):
+        return self.n_mines
+
+    def get_n_caselline_open(self):
+        return self.n_caselline_flagged
+
+    def getStatus(self):
+        return self.status
+
+    def get_n_caselline_flagged(self):
+        return self.n_caselline_flagged
+
     def reset_map(self):
         # Pulisce tutte casellina (mette is_mine = False, adjacent_n = 0 ecc.)
-        for x in range(0, self.b_size):
-            for y in range(0, self.b_size):
+        for x in range(0, self.size):
+            for y in range(0, self.size):
                 w = self.caselline[x][y]
                 w.reset() #Chiama la reset() della classe Quadratino
 
         #Aggiunge le mine ai quadratini
         positions = []
         while len(positions) < self.n_mines:
-            x, y = random.randint(0, self.b_size - 1), random.randint(0, self.b_size - 1)
+            x, y = random.randint(0, self.size - 1), random.randint(0, self.size - 1)
             if (x, y) not in positions:
                 w = self.caselline[x][y]
                 w.is_mine = True
@@ -101,8 +126,8 @@ class MinesweeperModel(QObject):
             return n_mines
 
         #Aggiunge i numeri ai quadratini che hanno delle bombe accanto
-        for x in range(0, self.b_size):
-            for y in range(0, self.b_size):
+        for x in range(0, self.size):
+            for y in range(0, self.size):
                 w = self.caselline[x][y] #ritorna un Casellina
                 w.adjacent_n = get_adjacency_n(x, y) #setto l'attibuto adjacent_n della classe Casellina. Sarebbe il n° di bombe accanto alla casella
 
@@ -111,8 +136,8 @@ class MinesweeperModel(QObject):
     def get_surrounding(self, x, y):  #surrounding = circostante
         positions = []
 
-        for xi in range(max(0, x - 1), min(x + 2, self.b_size)):
-            for yi in range(max(0, y - 1), min(y + 2, self.b_size)):
+        for xi in range(max(0, x - 1), min(x + 2, self.size)):
+            for yi in range(max(0, y - 1), min(y + 2, self.size)):
                 positions.append(self.caselline[xi][yi])  ## FORSE INVERTIRE X-Y
 
         return positions
@@ -133,8 +158,8 @@ class MinesweeperModel(QObject):
 
     #Scopre tutte le caselline, rivelando dove erano situate bombe e numeri
     def reveal_map(self):
-        for x in range(0, self.b_size):
-            for y in range(0, self.b_size):
+        for x in range(0, self.size):
+            for y in range(0, self.size):
                 w = self.caselline[x][y]
                 w.reveal()
 
@@ -146,8 +171,8 @@ class MinesweeperModel(QObject):
 
     # Slot associato al signal expandable. Viene chiamato quando clicco su una casellina.
     def expand_reveal(self, x, y):
-        for xi in range(max(0, x - 1), min(x + 2, self.b_size)):
-            for yi in range(max(0, y - 1), min(y + 2, self.b_size)):
+        for xi in range(max(0, x - 1), min(x + 2, self.size)):
+            for yi in range(max(0, y - 1), min(y + 2, self.size)):
                 w = self.caselline[xi][yi]
                 if not w.is_mine:
                     w.click()  # Se non è una mina chiama la click()
@@ -159,7 +184,7 @@ class MinesweeperModel(QObject):
 
     def isWin(self):
         self.n_caselline_open = self.n_caselline_open + 1
-        win = (self.b_size * self.b_size) - self.n_mines
+        win = (self.size * self.size) - self.n_mines
         if self.n_caselline_open == win:
             #Ho vinto
             self.update_status(MinesweeperModel.STATUS_SUCCESS)
@@ -302,7 +327,5 @@ class Casellina(QWidget):
         elif (e.button() == Qt.LeftButton):
             self.click()  # Chiamo la click() quando prmo con il sinistro
 
-            # if self.is_mine:  # Se nella casellina c'è la mina emetto il segnale di fine
-            #     Casellina.n_caselline_open = 0
-            #     self.finished.emit()  # esegue la game_over
+
 

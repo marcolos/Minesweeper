@@ -3,12 +3,12 @@ import csv
 # Chiamo la save quando esco
 class Save:
     def __init__(self,controller=None):
-        status = controller.model.status
-        counter = controller.model.counter
-        n_caselline_open = controller.model.n_caselline_open
-        size = controller.model.b_size
-        n_mines = controller.model.n_mines
-        n_caselline_flagged = controller.model.n_caselline_flagged
+        status = controller.model.getStatus()
+        counter = controller.model.getCounter()
+        n_caselline_open = controller.model.get_n_caselline_open()
+        size = controller.model.getSize()
+        n_mines = controller.model.get_n_mines()
+        n_caselline_flagged = controller.model.get_n_caselline_flagged()
 
         caselline = controller.model.getCaselline()
         tmp=[]

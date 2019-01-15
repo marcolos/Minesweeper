@@ -2,6 +2,7 @@ import sys
 from PyQt5.QtGui import *
 from PyQt5.QtWidgets import *
 from PyQt5.QtCore import *
+
 from view import MinesweeperView
 from model import MinesweeperModel
 from custom_dialog import CustomDialog
@@ -9,18 +10,20 @@ from save_resume import Save,Resume
 from leaderboard_dialog import LeaderboardDialog,InsertWinnerDialog
 from leaderboard_model import LeaderboardModel
 
-LEVELS = (
-    [9,10],
-    [16,40],
-    [25,99]
-)
 
-# PER TESTING
+
 # LEVELS = (
-#     [21, 2],
-#     [22, 3],
-#     [23,4]
+#     [9,10],
+#     [16,40],
+#     [25,99]
 # )
+
+#PER TESTING
+LEVELS = (
+    [21, 2],
+    [22, 3],
+    [23,4]
+)
 
 
 # CONTROLLER
@@ -69,8 +72,8 @@ class Minesweeper(QMainWindow):
 
     def connectSignal(self):
         # Connetto segnali delle caselline agli slot
-        for x in range(0, self.model.b_size):
-            for y in range(0, self.model.b_size):
+        for x in range(0, self.model.getSize()):
+            for y in range(0, self.model.getSize()):
                 c = self.model.getCaselline()
                 c[x][y].started.connect(self.model.trigger_start)
                 c[x][y].expandable.connect(self.model.expand_reveal)
@@ -107,26 +110,26 @@ class Minesweeper(QMainWindow):
     def statusUpdateView(self,status):
         self.view.button.setIcon(QIcon(self.model.STATUS_ICONS[status]))
         if status == 0: # STATUS_READY
-            self.model.counter = 0
-            self.view.clock.setText("%03d" % self.model.counter)
+            self.model.resetCounter()
+            self.view.clock.setText("%03d" % self.model.getCounter())
         if status == 1: # STATUS_PLAYING
             self.view._timer.start(1000)
         if status == 2: #STATUS_FAILED
             self.view._timer.stop()
         if status == 3: #STATUS_SUCCESS
             self.view._timer.stop()
-            if ([self.model.b_size,self.model.n_mines] == LEVELS[0] or LEVELS[1] or LEVELS[2]):
+            if ( (self.model.getLevel() == LEVELS[0]) or (self.model.getLevel() == LEVELS[1]) or (self.model.getLevel() == LEVELS[2]) ):
                 if self.model.oldWin is False:
                     self.insertWinner.dialog.exec_()
 
     # Slot incremento timer
     def everysecond(self):
-        self.model.counter = self.model.counter+1
-        self.view.clock.setText("%03d" % self.model.counter)
+        self.model.addCounter()
+        self.view.clock.setText("%03d" % self.model.getCounter())
 
     # Slot aggiornamento n°bombe - n°caselline flaggate
     def updateViewFlag(self):
-        self.view.mines.setText("%03d" % (self.model.n_mines - self.model.n_caselline_flagged))
+        self.view.mines.setText("%03d" % (self.model.get_n_mines() - self.model.get_n_caselline_open()))
 
     # Slot configurazione Custom
     def on_configure(self):
@@ -198,20 +201,20 @@ class Minesweeper(QMainWindow):
     def insert_winner(self):
         B,I,E = self.leaderboardModel.getFile()
         name = self.insertWinner.textinputs.text()
-        time = str(self.model.counter)
+        time = str(self.model.getCounter())
         tmp = []
         tmp.append(name)
         tmp.append(time)
 
-        if ([self.model.b_size, self.model.n_mines] == LEVELS[0]):
+        if (self.model.getLevel() == LEVELS[0]):
             B.append(tmp)
             B.sort(key=lambda x: int(x[1]))
             self.leaderboardModel.CSVwrite(B,'./sav/beginner_leaderboard.csv')
-        if ([self.model.b_size, self.model.n_mines] == LEVELS[1]):
+        if (self.model.getLevel() == LEVELS[1]):
             I.append(tmp)
             I.sort(key=lambda x: int(x[1]))
             self.leaderboardModel.CSVwrite(I,'./sav/intermediate_leaderboard.csv')
-        if ([self.model.b_size, self.model.n_mines] == LEVELS[2]):
+        if (self.model.getLevel() == LEVELS[2]):
             E.append(tmp)
             E.sort(key=lambda x: int(x[1]))
             self.leaderboardModel.CSVwrite(E,'./sav/expert_leaderboard.csv')

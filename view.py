@@ -72,8 +72,8 @@ class MinesweeperView(object):
         self.grid.setSpacing(5)  # Imposto lo spazio tra le griglie
 
         caselline=controller.model.getCaselline()  # Matrice contente tutte le caselline
-        for x in range(0, controller.model.b_size):  # Scorriamo la matrice
-            for y in range(0, controller.model.b_size):
+        for x in range(0, controller.model.getSize()):  # Scorriamo la matrice
+            for y in range(0, controller.model.getSize()):
                 self.grid.addWidget(caselline[x][y], x, y) # Aggiungiamo la caselline alla grid  ## FORSE INVERTIRE X-Y
                 # Nell addWidget bisogna mettere prima y e poi x perchè questa funzione prende (QWidjet,row, column)
                 # Facciamo quindi un inserimento per colonna (riempiamo prima tutta la 1° colonna e via di seguito)
