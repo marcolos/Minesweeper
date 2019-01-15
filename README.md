@@ -59,10 +59,30 @@ $ run main.py
 ### Main window
 The Main window presents itself like this:
 
-![](https://github.com/LucaAngioloni/GameOfLife/blob/master/images/Gui.png | width=100)
+![ ](https://github.com/marcolos/Minesweeper/blob/master/git_image/gui.png)
 
 ### Leaderboard
 When the user is playing at Beginner, Intermediate or Expert level and he win, he can insert his name in the Leaderboard. There is one leaderboard for each level that shows the best 10 player, sorted by increasing elapsed time. 
 
+![ ](https://github.com/marcolos/Minesweeper/blob/master/git_image/leaderboard.png)
+
 ### Customized game 
-The user can custom the game setting the size and the bombs number.
+The user can custom the game setting the size and the bombs number or he can select the three levels from Menu Bar 
+
+![custum](https://github.com/marcolos/Minesweeper/blob/master/git_image/custom.png)
+
+![select from menu bar](https://github.com/marcolos/Minesweeper/blob/master/git_image/select.png)
+
+### Save and Reload
+The game automatically will be saved when the user closes the app and it will be automatically reloaded when the user reopens the app. This is achieved creating a csv file that will maintain all the necessary variables to reload the game.
+
+### Game demonstration
+
+<img src="https://github.com/marcolos/Minesweeper/blob/master/git_image/play.gif" alt="Demonstration Gif" data-load="full">
+
+## Requirements
+
+| Software       | Version        | Required |
+| -------------- |:--------------:| --------:|
+| **Python**     |     >= 3.5     |    Yes   |
+| **PyQt5**      |     >= 5.1     |    Yes   |
