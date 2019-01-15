@@ -203,7 +203,7 @@ class MinesweeperModel(QObject):
 
 
 
-# Classe per creare le caselline nelle quali possono esserci numeri o bombe
+# Classe per creare le caselline
 class Casellina(QWidget):
     # Questi 4 segnali verrano utilizzati quando cliccheremo su una casellina
         # expandable: è un signal collegato allo slot expand_reveal, il quale espande le caselline vuote. Viene emesso dalla click()
@@ -233,14 +233,13 @@ class Casellina(QWidget):
     IMG_FLAG = QImage("./images/flag.png")
 
 
-
     def __init__(self, x, y, is_mine = False, adjacent_n = 0, is_revealed = False, is_flagged = False, *args, **kwargs):
         super(Casellina,self).__init__(*args, **kwargs)
 
         self.setFixedSize(QSize(20, 20))
 
-        self.x = x  # Posizione lunzo x
-        self.y = y  # Posizione lunzo y
+        self.x = x  # Posizione lungo x
+        self.y = y  # Posizione lungo y
         self.is_mine = is_mine  # Indica se è una bomba o no
         self.adjacent_n = adjacent_n  # Indica il numero di mine adiacenti a questa casellina
         self.is_revealed = is_revealed # Indica se è rivelata o meno
