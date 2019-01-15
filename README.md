@@ -41,11 +41,10 @@ For the leaderboard has been implemented another Model Class named `LeaderboardM
 ### The View
 There are a main view, a leaderboard view, custom view and insert winner view.
 They are implemented in the `MinesweeperView`, `LeaderboardDialog` `CustomDialog` and `InsertWinnerDialog` classes.
-There are a main view, a leaderboard view, and a custom view.
-The main view shows all the Minesweeper game.
-The leaderboard view shows the leaderboards. There are 3 leaderboards, one for each level (Beginner, Intermediate, Expert)
-The custom view allows you to set the mine numbers, and size.
-The insert winner dialog allows you to insert your name when you are playing at Beginner, Intermediate or Expert level and you win.
+- The main view shows all the Minesweeper game.
+- The leaderboard view shows the leaderboards.
+- The custom view allows you to set the mine numbers, and size.
+- The insert winner dialog allows you to insert your name when you are playing at Beginner, Intermediate or Expert level and you win.
 
 ## Functionalities
 The game can be launched from the `main.py` script:
@@ -57,5 +56,13 @@ or if you have installed anaconda you can do:
 $ ipython
 $ run main.py
 ```
+### Main window
 The Main window presents itself like this:
-![gui.png](./images/gui.png)
+
+![](https://github.com/LucaAngioloni/GameOfLife/blob/master/images/Gui.png | width=100)
+
+### Leaderboard
+When the user is playing at Beginner, Intermediate or Expert level and he win, he can insert his name in the Leaderboard. There is one leaderboard for each level that shows the best 10 player, sorted by increasing elapsed time. 
+
+### Customized game 
+The user can custom the game setting the size and the bombs number.
