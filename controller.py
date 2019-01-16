@@ -3,27 +3,27 @@ from PyQt5.QtGui import *
 from PyQt5.QtWidgets import *
 from PyQt5.QtCore import *
 
-from view import MinesweeperView
-from model import MinesweeperModel
-from custom_dialog import CustomDialog
-from save_resume import Save,Resume
-from leaderboard_dialog import LeaderboardDialog,InsertWinnerDialog
-from leaderboard_model import LeaderboardModel
+from Minesweeper.view import MinesweeperView
+from Minesweeper.model import MinesweeperModel
+from Minesweeper.custom_dialog import CustomDialog
+from Minesweeper.save_resume import Save,Resume
+from Minesweeper.leaderboard_dialog import LeaderboardDialog,InsertWinnerDialog
+from Minesweeper.leaderboard_model import LeaderboardModel
 
 
 
-LEVELS = (
-    [9,10],
-    [16,40],
-    [25,99]
-)
-
-# #PER TESTING
 # LEVELS = (
-#     [21, 2],
-#     [22, 3],
-#     [23,4]
+#     [9,10],
+#     [16,40],
+#     [25,99]
 # )
+
+#PER TESTING
+LEVELS = (
+    [21, 2],
+    [22, 3],
+    [23,4]
+)
 
 
 # CONTROLLER
@@ -33,19 +33,19 @@ class Minesweeper(QMainWindow):
 
         # Partita normale senza riesumare niente
         self.r = Resume()
-        if self.r.A is None:
-
-            # Instantiate a model.
-            self.model = MinesweeperModel()
+        if self.r.getMatrix() is None:
+            self.init()
 
         # Riesumo la vecchia partita
         else:
             status,counter,n_caselline_open,size,n_mines,n_caselline_flagged = self.r.getValue()
             M = self.r.getMatrix()
+            self.init(M = M, STATUS = status,counter = counter,n_caselline_open = n_caselline_open,LEVEL=[size,n_mines], n_caselline_flagged = n_caselline_flagged)
 
-            # Instantiate a model.
-            self.model = MinesweeperModel(M = M, STATUS = status,counter = counter,n_caselline_open = n_caselline_open,LEVEL=[size,n_mines], n_caselline_flagged = n_caselline_flagged)
 
+    def init(self,M = None, STATUS = None,counter = None,n_caselline_open = None,LEVEL=None, n_caselline_flagged = None):
+        # Instantiate a model.
+        self.model = MinesweeperModel(M = M, STATUS = STATUS,counter = counter,n_caselline_open = n_caselline_open,LEVEL=LEVEL, n_caselline_flagged = n_caselline_flagged)
 
         # Instantiate a view.
         self.view = MinesweeperView(self)
@@ -68,7 +68,6 @@ class Minesweeper(QMainWindow):
         # Chiamo questa funzione per emettere il primo segnale
         self.model.update_status(self.model.status)
         self.model.isFlagged(0)
-
 
     def connectSignal(self):
         # Connetto segnali delle caselline agli slot
@@ -93,13 +92,13 @@ class Minesweeper(QMainWindow):
         self.model.statusUpdate.connect(self.statusUpdateView)
 
         # Connetto le action del Menu bar
-        self.view.action_Beginner.triggered.connect(self.on_configureBeginner)
-        self.view.action_Intermediate.triggered.connect(self.on_configureIntermediate)
-        self.view.action_Expert.triggered.connect(self.on_configureExpert)
+        self.view.action_Beginner.triggered.connect(lambda: self.on_configure(0))
+        self.view.action_Intermediate.triggered.connect(lambda: self.on_configure(1))
+        self.view.action_Expert.triggered.connect(lambda: self.on_configure(2))
         # Connetto il CustomDialog alla dialog.exec_ in modo da farlo eseguire quango premo nel Custom del Menu bar
         self.view.action_Custom.triggered.connect(self.customDialog.dialog.exec_)
         # Connetto il bottone della CustomDialog
-        self.customDialog.configbutton.clicked.connect(self.on_configure)
+        self.customDialog.configbutton.clicked.connect(lambda: self.on_configure(3))
         # Connetto la leaderboard alla dialog.exec_ in modo da farlo eseguire quango premo nel Leaderboard del Menu bar
         self.view.action_Leaderboard.triggered.connect(self.leaderboardDialog.dialog.exec_)
         # Connetto il bottone della insertWinner
@@ -129,68 +128,30 @@ class Minesweeper(QMainWindow):
 
     # Slot aggiornamento n°bombe - n°caselline flaggate
     def updateViewFlag(self):
-        self.view.mines.setText("%03d" % (self.model.get_n_mines() - self.model.get_n_caselline_open()))
+        self.view.mines.setText("%03d" % (self.model.get_n_mines() - self.model.get_n_caselline_flagged()))
 
     # Slot configurazione Custom
-    def on_configure(self):
-        try:
-            size = int(self.customDialog.textinputs.text())
-            n_bombs = int(self.customDialog.textinputs2.text())
-            if(size<LEVELS[0][0]):
-                size = LEVELS[0][0]
-            if(size>50):
-                size = 50
-            if (n_bombs<1):
-                n_bombs=1
-            if (n_bombs>size*size):
-                n_bombs = size*size -1
-        except ValueError:
-            size,n_bombs = LEVELS[0]
+    def on_configure(self,num):
+        if (num == 3):
+            try:
+                size = int(self.customDialog.textinputs.text())
+                n_bombs = int(self.customDialog.textinputs2.text())
+                if(size<LEVELS[0][0]):
+                    size = LEVELS[0][0]
+                if(size>50):
+                    size = 50
+                if (n_bombs<1):
+                    n_bombs=1
+                if (n_bombs>size*size):
+                    n_bombs = size*size -1
+            except ValueError:
+                size,n_bombs = LEVELS[0]
 
-        self.model = MinesweeperModel(LEVEL=[size,n_bombs])
-        self.view = MinesweeperView(self)
-        self.customDialog = CustomDialog()
-        self.leaderboardModel = LeaderboardModel()
-        self.leaderboardDialog = LeaderboardDialog(self)
-        self.insertWinner = InsertWinnerDialog()
-        self.connectSignal()
-        self.resize(self.sizeHint())
+            self.init(LEVEL=[size,n_bombs])
 
-    # Configurazione Beginner
-    def on_configureBeginner(self):
-        size,n_bombs = LEVELS[0]
-        self.model = MinesweeperModel(LEVEL=[size, n_bombs])
-        self.view = MinesweeperView(self)
-        self.customDialog = CustomDialog()
-        self.leaderboardModel = LeaderboardModel()
-        self.leaderboardDialog = LeaderboardDialog(self)
-        self.insertWinner = InsertWinnerDialog()
-        self.connectSignal()
-        self.resize(self.sizeHint())
+        else:
+            self.init(LEVEL=LEVELS[num])
 
-    # Configurazione Intermediate
-    def on_configureIntermediate(self):
-        size, n_bombs = LEVELS[1]
-        self.model = MinesweeperModel(LEVEL=[size, n_bombs])
-        self.view = MinesweeperView(self)
-        self.customDialog = CustomDialog()
-        self.leaderboardModel = LeaderboardModel()
-        self.leaderboardDialog = LeaderboardDialog(self)
-        self.insertWinner = InsertWinnerDialog()
-        self.connectSignal()
-        self.resize(self.sizeHint())
-
-    # Configurazione Expert
-    def on_configureExpert(self):
-        size, n_bombs = LEVELS[2]
-        self.model = MinesweeperModel(LEVEL=[size, n_bombs])
-        self.view = MinesweeperView(self)
-        self.customDialog = CustomDialog()
-        self.leaderboardModel = LeaderboardModel()
-        self.leaderboardDialog = LeaderboardDialog(self)
-        self.insertWinner = InsertWinnerDialog()
-        self.connectSignal()
-        self.resize(self.sizeHint())
 
     # Salvataggio. Viene chiamata quando chiudo l'applicazione
     def closeEvent(self, event):

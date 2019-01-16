@@ -94,7 +94,7 @@ class MinesweeperModel(QObject):
         return self.n_mines
 
     def get_n_caselline_open(self):
-        return self.n_caselline_flagged
+        return self.n_caselline_open
 
     def getStatus(self):
         return self.status
@@ -187,7 +187,12 @@ class MinesweeperModel(QObject):
         win = (self.size * self.size) - self.n_mines
         if self.n_caselline_open == win:
             #Ho vinto
+            for i in range(self.size):
+                for j in range(self.size):
+                    if (self.caselline[i][j].is_revealed == False) and (self.caselline[i][j].is_flagged == False):
+                        self.caselline[i][j].flag()
             self.update_status(MinesweeperModel.STATUS_SUCCESS)
+
 
     def isFlagged(self,num):
         self.n_caselline_flagged = self.n_caselline_flagged + num
