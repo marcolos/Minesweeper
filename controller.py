@@ -12,18 +12,18 @@ from Minesweeper.leaderboard_model import LeaderboardModel
 
 
 
-# LEVELS = (
-#     [9,10],
-#     [16,40],
-#     [25,99]
-# )
-
-#PER TESTING
 LEVELS = (
-    [21, 2],
-    [22, 3],
-    [23,4]
+    [9,10],
+    [16,40],
+    [25,99]
 )
+
+# #PER TESTING
+# LEVELS = (
+#     [21, 2],
+#     [22, 3],
+#     [23,4]
+# )
 
 
 # CONTROLLER
