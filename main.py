@@ -1,6 +1,6 @@
 import sys
 from PyQt5.QtWidgets import QApplication
-from Minesweeper.controller import Minesweeper
+from controller import Minesweeper
 
 
 sys.setrecursionlimit(15000)

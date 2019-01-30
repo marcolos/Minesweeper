@@ -3,12 +3,12 @@ from PyQt5.QtGui import *
 from PyQt5.QtWidgets import *
 from PyQt5.QtCore import *
 
-from Minesweeper.view import MinesweeperView
-from Minesweeper.model import MinesweeperModel
-from Minesweeper.custom_dialog import CustomDialog
-from Minesweeper.save_resume import Save,Resume
-from Minesweeper.leaderboard_dialog import LeaderboardDialog,InsertWinnerDialog
-from Minesweeper.leaderboard_model import LeaderboardModel
+from view import MinesweeperView
+from model import MinesweeperModel
+from custom_dialog import CustomDialog
+from save_resume import Save,Resume
+from leaderboard_dialog import LeaderboardDialog,InsertWinnerDialog
+from leaderboard_model import LeaderboardModel
 
 
 
